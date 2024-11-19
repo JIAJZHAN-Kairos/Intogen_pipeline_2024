@@ -1,0 +1,48 @@
+# Ignore datasets and containers
+datasets/
+containers/
+!build/containers
+!build/datasets
+*.simg
+
+# Intellij IDEA files
+.idea
+*.iml
+*.ipr
+*.iws
+*.eggs
+
+# Eclipse files
+.classpath
+.project
+.settings/
+.ropeproject
+
+# VSCode
+.vscode
+
+# gEdit temporal files
+*~
+
+# Python bytecode
+*.pyc
+*.egg-info/
+core/build/lib/
+dist/
+combination/build
+*.c
+*.so
+
+# Build docs
+docs/build
+
+# Mutpanning jar file
+build/containers/mutpanning/MutPanning.jar
+
+# Nextflow run files
+.nextflow*
+work
+*timeline*
+*trace*
+
+smregions
