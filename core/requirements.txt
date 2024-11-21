@@ -1,0 +1,8 @@
+bgdata
+bgparsers
+bgreference
+intervaltree
+numpy
+pandas
+pyliftover
+pytabix
