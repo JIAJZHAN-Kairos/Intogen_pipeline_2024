@@ -23,16 +23,30 @@ process ParseInput {
 
 	script:
 		
-		if ( input.toRealPath().toFile().isDirectory() || input.endsWith(".bginfo" )) {
-			"""
-			openvar groupby ${input} --header -g DATASET -q -s 'gzip > \${GROUP_KEY}.parsed.tsv.gz'
-			"""
-		}
-		else {
-			cohort = input.baseName.split('\\.')[0]
-			"""
-			openvar cat ${input} --header | gzip > ${cohort}.parsed.tsv.gz
-			"""
+		if (input.startsWith("s3://")) {
+		    println "Processing S3 input path: ${input}"
+		    if (input.endsWith(".bginfo")) {
+		        """
+		        aws s3 cp ${input} - | openvar groupby --header -g DATASET -q -s 'gzip > \${GROUP_KEY}.parsed.tsv.gz'
+		        """
+		    } else {
+		        cohort = input.tokenize('/').last().split('\\.')[0]
+		        """
+		        aws s3 cp ${input} - | openvar cat --header | gzip > ${cohort}.parsed.tsv.gz
+		        """
+		    }
+		} else {
+		    println "Processing local input path: ${input}"
+		    if (file(input).isDirectory() || input.endsWith(".bginfo")) {
+		        """
+		        openvar groupby ${input} --header -g DATASET -q -s 'gzip > \${GROUP_KEY}.parsed.tsv.gz'
+		        """
+		    } else {
+		        cohort = file(input).baseName.split('\\.')[0]
+		        """
+		        openvar cat ${input} --header | gzip > ${cohort}.parsed.tsv.gz
+		        """
+		    }
 		}
 }
 
