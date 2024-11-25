@@ -125,13 +125,14 @@ process ProcessVariants {
 		tuple val(cohort), path("${output}.stats.json") into STATS_VARIANTS
 
 	script:
-		echo "DEBUG: BGDATA_LOCAL=$BGDATA_LOCAL"
-		echo "DEBUG: INTOGEN_DATASETS=$INTOGEN_DATASETS"
-		aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/bgdata/datasets/genomereference/ ./datasets/genomereference/ --recursive
 		cutoff = CUTOFFS[platform]
 		output = "${cohort}.tsv.gz"
 		if (cutoff)
 			"""
+			echo "DEBUG: BGDATA_LOCAL=$BGDATA_LOCAL"
+		        echo "DEBUG: INTOGEN_DATASETS=$INTOGEN_DATASETS"
+			ls s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/bgdata/datasets/genomereference/ --recursive
+		        aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/bgdata/datasets/genomereference/ ./datasets/genomereference/ --recursive
 			parse-variants --input ${input} --output ${output} \
 				--genome ${genome.toLowerCase()} \
 				--cutoff ${cutoff}
