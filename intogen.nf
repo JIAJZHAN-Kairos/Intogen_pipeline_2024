@@ -129,6 +129,7 @@ process ProcessVariants {
 		output = "${cohort}.tsv.gz"
 		if (cutoff)
 			"""
+			aws s3 ls s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/bgdata/datasets/genomereference/
 			parse-variants --input ${input} --output ${output} \
 				--genome ${genome.toLowerCase()} \
 				--cutoff ${cutoff}
