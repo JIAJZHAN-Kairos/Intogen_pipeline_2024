@@ -664,7 +664,7 @@ process deconstructSigs {
 
 process CohortCounts {
 	tag "Count variants ${cohort}"
-
+        label "core"
     input:
         tuple val(cohort), path(input), val(cancer), val(platform) from COHORTS5.join(CANCERS2).join(PLATFORMS3)
 
