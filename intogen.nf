@@ -136,8 +136,6 @@ process ProcessVariants {
 			mkdir -p ./datasets/bgdata/datasets/genomereference/
 			aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ ./datasets/ --recursive
 			ls -R ./datasets/bgdata/datasets/genomereference/
-			//aws s3 ls s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/bgdata/datasets/genomereference/
-			
 			parse-variants --input ${input} --output ${output} \
 				--genome ${genome.toLowerCase()} \
 				--cutoff ${cutoff}
