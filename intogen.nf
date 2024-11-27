@@ -118,7 +118,8 @@ process ProcessVariants {
 	publishDir "${STEPS_FOLDER}/variants", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input), val(platform), val(genome) from COHORTS4.join(PLATFORMS1).join(GENOMES)
+		//tuple val(cohort), path(input), val(platform), val(genome) from COHORTS4.join(PLATFORMS1).join(GENOMES)
+		tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES).combine(REFERENCE_FILES)
 
 	output:
 		tuple val(cohort), path(output) into VARIANTS
@@ -129,8 +130,11 @@ process ProcessVariants {
 		output = "${cohort}.tsv.gz"
 		if (cutoff)
 			"""
-			export BGDATA_LOCAL='s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/bgdata/'
+			export BGDATA_LOCAL="./datasets/bgdata"
 			export BGDATA_OFFLINE='TRUE'
+			mkdir -p ./datasets/genomereference
+			cp -r ${referenceFiles}/* ./datasets/genomereference/
+			ls ./datasets/genomereference/
 			aws s3 ls s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/bgdata/datasets/genomereference/
 			parse-variants --input ${input} --output ${output} \
 				--genome ${genome.toLowerCase()} \
