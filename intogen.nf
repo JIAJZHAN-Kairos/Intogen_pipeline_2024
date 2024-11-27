@@ -119,7 +119,8 @@ process ProcessVariants {
 
 	input:
 		//tuple val(cohort), path(input), val(platform), val(genome) from COHORTS4.join(PLATFORMS1).join(GENOMES)
-		tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES).combine(REFERENCE_FILES)
+		//tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES).combine(REFERENCE_FILES)
+		tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES).combine(Channel.fromPath(params.referenceFiles, checkIfExists: true))
 
 	output:
 		tuple val(cohort), path(output) into VARIANTS
