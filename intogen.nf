@@ -134,7 +134,7 @@ process ProcessVariants {
 			export BGDATA_LOCAL="./datasets/bgdata"
 			export BGDATA_OFFLINE='TRUE'
 			mkdir -p ./datasets/genomereference
-			cp -r ${referenceFiles}/* ./datasets/genomereference/
+			aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/bgdata/datasets/genomereference/ ./datasets/genomereference/ --recursive
 			ls ./datasets/genomereference/
 			aws s3 ls s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/bgdata/datasets/genomereference/
 			parse-variants --input ${input} --output ${output} \
