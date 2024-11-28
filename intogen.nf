@@ -7,7 +7,15 @@ STEPS_FOLDER = file(params.stepsFolder)
 ANNOTATIONS = Channel.value(params.annotations)
 REGIONS = Channel.value("${params.datasets}/regions/cds.regions.gz")
 
-
+process DownloadDatasets {
+    tag "Download datasets"
+    script:
+    """
+    mkdir -p ./datasets/
+    aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ ./datasets/ --recursive
+    ls -R ./datasets/
+    """
+    }
 
 process ParseInput {
 	tag "Parse input ${input}"
