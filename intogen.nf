@@ -16,9 +16,10 @@ process DownloadDatasets {
 
     script:
     """
-    mkdir -p ./datasets/
-    aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ ./datasets/ --recursive
-    ls -R ./datasets/
+    #mkdir -p ./datasets/
+    #aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ ./datasets/ --recursive
+    #ls -R ./datasets/
+    aws s3 sync s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ s3://org.umccr.nf-tower.tower/intogen-plus-2024/datasets/
     """
     }
 
@@ -145,7 +146,7 @@ process ProcessVariants {
 		output = "${cohort}.tsv.gz"
 		if (cutoff)
 			"""
-			export BGDATA_LOCAL="${referenceFiles}/bgdata"
+			#export BGDATA_LOCAL="${referenceFiles}/bgdata"
 			parse-variants --input ${input} --output ${output} \
 				--genome ${genome.toLowerCase()} \
 				--cutoff ${cutoff}
