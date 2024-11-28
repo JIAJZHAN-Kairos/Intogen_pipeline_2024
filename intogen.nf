@@ -10,6 +10,10 @@ REGIONS = Channel.value("${params.datasets}/regions/cds.regions.gz")
 process DownloadDatasets {
     tag "Download datasets"
     label "core"
+
+    output:
+    path "./datasets" into REFERENCE_FILES
+
     script:
     """
     mkdir -p ./datasets/
@@ -128,6 +132,7 @@ process ProcessVariants {
 
 	input:
 		tuple val(cohort), path(input), val(platform), val(genome) from COHORTS4.join(PLATFORMS1).join(GENOMES)
+		path referenceFiles from REFERENCE_FILES
 		//tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES).combine(REFERENCE_FILES)
 		//tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES)
 
@@ -140,6 +145,7 @@ process ProcessVariants {
 		output = "${cohort}.tsv.gz"
 		if (cutoff)
 			"""
+			export BGDATA_LOCAL="${referenceFiles}/bgdata"
 			parse-variants --input ${input} --output ${output} \
 				--genome ${genome.toLowerCase()} \
 				--cutoff ${cutoff}
