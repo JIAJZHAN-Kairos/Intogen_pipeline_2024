@@ -303,7 +303,7 @@ process OncodriveCLUSTL {
 			"""
 		else
 			"""
-			oncodriveclustl -i ${input} -r ${regions} \
+			oncodriveclustl -i ${input} -r ${params.datasets}/regions/cds.regions.gz \
 				-g hg38 -sim region_restricted -n 1000 -kmer 3 \
 				-sig ${signature} --concatenate \
 				-c ${task.cpus} \
