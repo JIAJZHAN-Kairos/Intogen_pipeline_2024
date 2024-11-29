@@ -239,7 +239,7 @@ process OncodriveFML {
     input:
         tuple val(cohort), path(input), path(signature)  from VARIANTS_FML.join(SIGNATURES1)
 	path referenceFiles from REFERENCE_FILES
-        path regions from REGIONS
+        //path regions from REGIONS
     output:
         tuple val(cohort), path("out/*.tsv.gz") into OUT_ONCODRIVEFML
 
@@ -247,7 +247,7 @@ process OncodriveFML {
 		seedOpt = (params.seed == null)? '': "--seed ${params.seed}"
 		debugOpt =  (params.debug)? '--debug': ''
 		"""
-		oncodrivefml -i ${input} -e ${regions} --signature ${signature} \
+		oncodrivefml -i ${input} -e $./datasets/regions/cds.regions.gz --signature ${signature} \
 			-c /oncodrivefml/oncodrivefml_v2.conf  --cores ${task.cpus} \
 			-o out ${seedOpt} ${debugOpt}
 		"""
