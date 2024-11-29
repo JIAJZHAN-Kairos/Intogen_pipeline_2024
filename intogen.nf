@@ -7,6 +7,23 @@ STEPS_FOLDER = file(params.stepsFolder)
 ANNOTATIONS = Channel.value(params.annotations)
 REGIONS = Channel.value("${params.datasets}/regions/cds.regions.gz")
 
+
+
+process DownloadDatasets {
+    tag "Download datasets"
+    label "core"
+
+    output:
+    path "./datasets/" into REFERENCE_FILES
+
+    script:
+    """
+    mkdir -p ./datasets/
+    aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ ./datasets/ --recursive
+    """
+    }
+
+
 process ParseInput {
 	tag "Parse input ${input}"
 	label "core"
@@ -117,7 +134,7 @@ process ProcessVariants {
 
 	input:
 		tuple val(cohort), path(input), val(platform), val(genome) from COHORTS4.join(PLATFORMS1).join(GENOMES)
-		//path referenceFiles from REFERENCE_FILES
+		path referenceFiles from REFERENCE_FILES
 		//tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES).combine(REFERENCE_FILES)
 		//tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES)
 
@@ -149,7 +166,7 @@ process FormatSignature {
 
 	input:
 		tuple val(cohort), path(input) from VARIANTS1
-
+		
 	output:
 		tuple val(cohort), path(output) into VARIANTS_SIG
 
@@ -171,7 +188,7 @@ process ComputeProfile {
 
 	input:
 		tuple val(cohort), path(input), val(platform) from VARIANTS_SIG.join(PLATFORMS2)
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into SIGNATURES
 
