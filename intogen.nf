@@ -261,7 +261,7 @@ process FormatCLUSTL {
 
 	input:
 		tuple val(cohort), path(input) from VARIANTS3
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into VARIANTS_CLUSTL
 
