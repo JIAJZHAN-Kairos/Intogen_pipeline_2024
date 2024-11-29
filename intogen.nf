@@ -130,7 +130,6 @@ process ProcessVariants {
 		output = "${cohort}.tsv.gz"
 		if (cutoff)
 			"""
-			#export BGDATA_LOCAL="${referenceFiles}/bgdata"
 			parse-variants --input ${input} --output ${output} \
 				--genome ${genome.toLowerCase()} \
 				--cutoff ${cutoff}
