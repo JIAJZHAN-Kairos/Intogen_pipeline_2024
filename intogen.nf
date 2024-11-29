@@ -247,7 +247,7 @@ process OncodriveFML {
 		seedOpt = (params.seed == null)? '': "--seed ${params.seed}"
 		debugOpt =  (params.debug)? '--debug': ''
 		"""
-		oncodrivefml -i ${input} -e ./datasets/regions/cds.regions.gz --signature ${signature} \
+		oncodrivefml -i ${input} -e ${params.datasets}/regions/cds.regions.gz --signature ${signature} \
 			-c /oncodrivefml/oncodrivefml_v2.conf  --cores ${task.cpus} \
 			-o out ${seedOpt} ${debugOpt}
 		"""
