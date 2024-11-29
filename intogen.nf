@@ -291,7 +291,7 @@ process OncodriveCLUSTL {
 		debugOpt =  (params.debug)? '--log-level debug': ''
 		if (['CM', 'SBCC', 'SSCC'].contains(cancer))
 			"""
-			oncodriveclustl -i ${input} -r ${regions} \
+			oncodriveclustl -i ${input} -r ${params.datasets}/regions/cds.regions.gz \
 				-g hg38 -sim region_restricted -n 1000 -kmer 5 \
 				-sigcalc region_normalized \
 				--concatenate \
