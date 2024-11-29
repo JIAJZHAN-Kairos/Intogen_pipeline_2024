@@ -238,8 +238,8 @@ process OncodriveFML {
 
     input:
         tuple val(cohort), path(input), path(signature)  from VARIANTS_FML.join(SIGNATURES1)
-        path regions from REGIONS
 	path referenceFiles from REFERENCE_FILES
+        path regions from REGIONS
     output:
         tuple val(cohort), path("out/*.tsv.gz") into OUT_ONCODRIVEFML
 
