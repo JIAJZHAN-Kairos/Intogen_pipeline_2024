@@ -239,7 +239,7 @@ process OncodriveFML {
     input:
         tuple val(cohort), path(input), path(signature)  from VARIANTS_FML.join(SIGNATURES1)
         path regions from REGIONS
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path("out/*.tsv.gz") into OUT_ONCODRIVEFML
 
@@ -277,11 +277,11 @@ process FormatCLUSTL {
 process OncodriveCLUSTL {
     tag "OncodriveCLUSTL ${cohort}"
     publishDir "${STEPS_FOLDER}/oncodriveclustl", mode: "copy"
-
+	
     input:
         tuple val(cohort), path(input), path(signature), val(cancer) from VARIANTS_CLUSTL.join(SIGNATURES2).join(CANCERS1)
         path regions from REGIONS
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path("${cohort}.elements_results.txt") into OUT_ONCODRIVECLUSTL
         tuple val(cohort), path("${cohort}.clusters_results.tsv") into OUT_ONCODRIVECLUSTL_CLUSTERS
@@ -381,10 +381,10 @@ process FormatVEP {
 process VEP {
 	tag "VEP ${cohort}"
 	publishDir "${STEPS_FOLDER}/vep", mode: "copy"
-
+	
     input:
         tuple val(cohort), path(input) from VARIANTS_VEP
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path(output) into OUT_VEP
 
@@ -467,7 +467,7 @@ process SMRegions {
     input:
         tuple val(cohort), path(input), path(signature)  from VARIANTS_SMREGIONS.join(SIGNATURES3)
         path regions from REGIONS
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path(output) into OUT_SMREGIONS
 
@@ -512,7 +512,7 @@ process CBaSE {
 
     input:
         tuple val(cohort), path(input) from VARIANTS_CBASE
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path(output) into OUT_CBASE
 
@@ -554,7 +554,7 @@ process MutPanning {
 
     input:
         tuple val(cohort), path(mutations), path(samples) from VARIANTS_MUTPANNING
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path("out/SignificanceFiltered/Significance${cohort}.txt") into OUT_MUTPANNING
 
