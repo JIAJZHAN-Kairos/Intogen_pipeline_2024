@@ -247,6 +247,8 @@ process OncodriveFML {
 		seedOpt = (params.seed == null)? '': "--seed ${params.seed}"
 		debugOpt =  (params.debug)? '--debug': ''
 		"""
+		export LC_ALL=C.UTF-8
+    		export LANG=C.UTF-8
 		oncodrivefml -i ${input} -e ${params.datasets}/regions/cds.regions.gz --signature ${signature} \
 			-c /oncodrivefml/oncodrivefml_v2.conf  --cores ${task.cpus} \
 			-o out ${seedOpt} ${debugOpt}
