@@ -280,7 +280,7 @@ process OncodriveCLUSTL {
 	
     input:
         tuple val(cohort), path(input), path(signature), val(cancer) from VARIANTS_CLUSTL.join(SIGNATURES2).join(CANCERS1)
-        path regions from REGIONS
+        //path regions from REGIONS
 	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path("${cohort}.elements_results.txt") into OUT_ONCODRIVECLUSTL
