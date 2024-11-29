@@ -12,7 +12,7 @@ process DownloadDatasets {
     label "core"
 
     output:
-    path "./datasets" into REFERENCE_FILES
+    path "s3://org.umccr.nf-tower.tower/intogen-plus-2024/datasets/" into REFERENCE_FILES
 
     script:
     """
