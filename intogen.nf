@@ -340,7 +340,7 @@ process dNdScv {
 
     input:
         tuple val(cohort), path(input) from VARIANTS_DNDSCV
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path("${cohort}.dndscv.tsv.gz") into OUT_DNDSCV
         tuple val(cohort), path("${cohort}.dndscv_annotmuts.tsv.gz") into OUT_DNDSCV_ANNOTMUTS
@@ -595,7 +595,7 @@ process HotMAPS {
 
     input:
         tuple val(cohort), path(input), path(signatures) from VARIANTS_HOTMAPS.join(SIGNATURES4)
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path("*.out.gz") into OUT_HOTMAPS
         tuple val(cohort), path("*.clusters.gz") into OUT_HOTMAPS_CLUSTERS
@@ -614,7 +614,7 @@ process Combination {
 
     input:
         tuple val(cohort), path(fml), path(clustl), path(dndscv), path(smregions), path(cbase), path(mutpanning), path(hotmaps) from OUT_ONCODRIVEFML.join(OUT_ONCODRIVECLUSTL).join(OUT_DNDSCV1).join(OUT_SMREGIONS1).join(OUT_CBASE).join(OUT_MUTPANNING).join(OUT_HOTMAPS)
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path("${cohort}.05.out.gz") into OUT_COMBINATION
 
@@ -660,7 +660,7 @@ process deconstructSigs {
 
     input:
         tuple val(cohort), path(input) from VARIANTS_DECONSTRUCTSIGS1
-
+	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path(output) into OUT_DECONSTRUCTSIGS
         tuple val(cohort), path("*.signature_likelihood") into OUT_DECONSTRUCTSIGS_SIGLIKELIHOOD
@@ -706,7 +706,7 @@ process CohortSummary {
 
     input:
         path(input) from COHORT_COUNTS_LIST.collect()
-
+	path referenceFiles from REFERENCE_FILES
     output:
 		path(output) into COHORT_SUMMARY
 
