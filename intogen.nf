@@ -468,7 +468,7 @@ process SMRegions {
 
     input:
         tuple val(cohort), path(input), path(signature)  from VARIANTS_SMREGIONS.join(SIGNATURES3)
-        path regions from REGIONS
+        //path regions from REGIONS
 	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path(output) into OUT_SMREGIONS
@@ -478,7 +478,7 @@ process SMRegions {
 		seedOpt = (params.seed == null)? '': "--seed ${params.seed}"
 		debugOpt =  (params.debug)? '--debug': ''
 		"""
-		smregions -m ${input} -e ${regions} \
+		smregions -m ${input} -e ${params.datasets}/regions/cds.regions.gz \
 			-r ${params.datasets}/smregions/regions_pfam.tsv \
 			-s ${signature} --cores ${task.cpus} \
 			-c /smregions/smregions.conf \
