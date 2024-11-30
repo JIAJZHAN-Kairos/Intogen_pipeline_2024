@@ -496,7 +496,7 @@ process FormatCBaSE {
 
 	input:
 		tuple val(cohort), path(input) from PARSED_VEP2
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into VARIANTS_CBASE
 
