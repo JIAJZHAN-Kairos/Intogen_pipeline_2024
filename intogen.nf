@@ -642,7 +642,7 @@ process FormatdeconstructSigs {
 
 	input:
 		tuple val(cohort), path(input) from PARSED_VEP5
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into VARIANTS_DECONSTRUCTSIGS
 
