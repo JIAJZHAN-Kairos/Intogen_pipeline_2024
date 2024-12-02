@@ -603,7 +603,6 @@ process HotMAPS {
 
 	script:
 		"""
-		export PATH=/usr/bin:/bin:/usr/local/bin:$PATH
 		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
 			${params.datasets}/hotmaps ${task.cpus}
 		"""
