@@ -1,4 +1,3 @@
-f#!/usr/bin/env /home/kairos/miniconda3/envs/test/bin/python
 nextflow.enable.dsl=1
 // Set here a list of files or directories to use. E.g. Channel.fromPath(["/path/*", "/path2/file"], type: 'any')
 INPUT = Channel.fromPath(params.input.tokenize())
