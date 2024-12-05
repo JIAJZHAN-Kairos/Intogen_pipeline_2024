@@ -603,8 +603,6 @@ process HotMAPS {
 
 	script:
 		"""
-		mkdir -p /home/ec2-user/miniconda/bin
-		ln -s /usr/bin/python /home/ec2-user/miniconda/bin/python
 		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
 			${params.datasets}/hotmaps ${task.cpus}
 		"""
