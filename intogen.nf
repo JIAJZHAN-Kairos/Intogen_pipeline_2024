@@ -604,7 +604,7 @@ process HotMAPS {
 
 	script:
 		"""
-		/bin/bash /custom_rootfs/hotmaps/hotmaps.sh ${input} . ${signatures} \
+		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
 			${params.datasets}/hotmaps ${task.cpus}
 		"""
 }
