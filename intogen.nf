@@ -603,6 +603,7 @@ process HotMAPS {
 
 	script:
 		"""
+		which aws
 		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
 			${params.datasets}/hotmaps ${task.cpus}
 		"""
