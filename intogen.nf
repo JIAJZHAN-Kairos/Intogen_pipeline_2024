@@ -597,7 +597,7 @@ process HotMAPS {
     	stageOutMode 'copy'
     input:
         tuple val(cohort), path(input), path(signatures) from VARIANTS_HOTMAPS.join(SIGNATURES4)
-	path referenceFiles from REFERENCE_FILES
+	//path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path("*.out.gz") into OUT_HOTMAPS
         tuple val(cohort), path("*.clusters.gz") into OUT_HOTMAPS_CLUSTERS
