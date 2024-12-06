@@ -10,7 +10,6 @@ REGIONS = Channel.value("${params.datasets}/regions/cds.regions.gz")
 
 process DownloadDatasets {
     tag "Download datasets"
-    label "core"
 
     output:
     path "./datasets/" into REFERENCE_FILES
