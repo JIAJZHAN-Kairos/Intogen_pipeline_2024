@@ -602,8 +602,9 @@ process HotMAPS {
 
 	script:
 		"""
-		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
-			${params.datasets}/hotmaps ${task.cpus}
+		which python
+		#/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
+		#	${params.datasets}/hotmaps ${task.cpus}
 		"""
 }
 
