@@ -606,8 +606,8 @@ process HotMAPS {
 		"""
 		set -xe
 		which python
-		ln -s /usr/bin/python /home/ec2-user/miniconda/bin/python
-		/home/ec2-user/miniconda/bin/aws --version
+		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
+			${params.datasets}/hotmaps ${task.cpus}
 		"""
 }
 
