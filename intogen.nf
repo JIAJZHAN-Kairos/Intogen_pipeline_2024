@@ -34,7 +34,7 @@ process ParseInput {
 	input:
 		path input from INPUT
 		path annotations from ANNOTATIONS
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		path("*.parsed.tsv.gz") into COHORTS
 
