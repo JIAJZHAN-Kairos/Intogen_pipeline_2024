@@ -593,8 +593,6 @@ process FormatHotMAPS {
 process HotMAPS {
 	tag "HotMAPS ${cohort}"
 	publishDir "${STEPS_FOLDER}/hotmaps", mode: "copy"
-    	stageInMode 'copy'
-    	stageOutMode 'copy'
     input:
         tuple val(cohort), path(input), path(signatures) from VARIANTS_HOTMAPS.join(SIGNATURES4)
 	//path referenceFiles from REFERENCE_FILES
@@ -604,8 +602,6 @@ process HotMAPS {
 
 	script:
 		"""
-		set -xe
-		which python
 		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
 			${params.datasets}/hotmaps ${task.cpus}
 		"""
