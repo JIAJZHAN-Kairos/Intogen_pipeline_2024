@@ -604,7 +604,7 @@ process HotMAPS {
 
 	script:
 		"""
-		/home/ec2-user/miniconda/bin/conda install -c conda-forge awscli
+		set -xe
 		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
 			${params.datasets}/hotmaps ${task.cpus}
 		"""
