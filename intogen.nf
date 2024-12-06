@@ -19,6 +19,10 @@ process DownloadDatasets {
     """
     mkdir -p ./datasets/
     aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ ./datasets/ --recursive
+    mkdir -p ./containers/
+    aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/containers/ ./containers/ --recursive
+    mkdir -p ./config/
+    aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/config/ ./config/ --recursive
     """
     }
 
