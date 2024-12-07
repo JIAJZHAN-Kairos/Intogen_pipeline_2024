@@ -79,7 +79,7 @@ process LoadCancer {
 
 	input:
 		tuple val(cohort), path(input) from COHORTS1
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), stdout into CANCERS
 
@@ -98,7 +98,7 @@ process LoadPlatform {
 
 	input:
 		tuple val(cohort), path(input) from COHORTS2
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), stdout into PLATFORMS
 
