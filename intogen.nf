@@ -75,7 +75,7 @@ COHORTS
 
 process LoadCancer {
 	tag "Load cancer type ${cohort}"
-	label "core"
+	//label "core"
 
 	input:
 		tuple val(cohort), path(input) from COHORTS1
@@ -85,7 +85,7 @@ process LoadCancer {
 
 	script:
 		"""
-		get_field.sh ${input} CANCER
+		singularity exec ./containers/intogen-core.simg get_field.sh ${input} CANCER
 		"""
 }
 
@@ -94,7 +94,7 @@ CANCERS.into { CANCERS1; CANCERS2; CANCERS3 }
 
 process LoadPlatform {
 	tag "Load sequencing platform ${cohort}"
-	label "core"
+	//label "core"
 
 	input:
 		tuple val(cohort), path(input) from COHORTS2
@@ -104,7 +104,7 @@ process LoadPlatform {
 
 	script:
 		"""
-		get_field.sh ${input} PLATFORM
+		singularity exec ./containers/intogen-core.simg get_field.sh ${input} PLATFORM
 		"""
 }
 
@@ -112,7 +112,7 @@ PLATFORMS.into { PLATFORMS1; PLATFORMS2; PLATFORMS3 }
 
 process LoadGenome {
 	tag "Load reference genome ${cohort}"
-	label "core"
+	//label "core"
 
 	input:
 		tuple val(cohort), path(input) from COHORTS3
@@ -122,7 +122,7 @@ process LoadGenome {
 
 	script:
 		"""
-		get_field.sh ${input} GENOMEREF
+		singularity exec ./containers/intogen-core.simg get_field.sh ${input} GENOMEREF
 		"""
 }
 
@@ -130,7 +130,7 @@ CUTOFFS = ['WXS': 1000, 'WGS': 10000]
 
 process ProcessVariants {
 	tag "Process variants ${cohort}"
-	label "core"
+	//label "core"
 	errorStrategy 'ignore'  // if a cohort does not pass the filters, do not proceed with it
 	publishDir "${STEPS_FOLDER}/variants", mode: "copy"
 
@@ -149,7 +149,7 @@ process ProcessVariants {
 		output = "${cohort}.tsv.gz"
 		if (cutoff)
 			"""
-			parse-variants --input ${input} --output ${output} \
+			singularity exec ./containers/intogen-core.simg parse-variants --input ${input} --output ${output} \
 				--genome ${genome.toLowerCase()} \
 				--cutoff ${cutoff}
 			"""
@@ -163,7 +163,7 @@ VARIANTS.into { VARIANTS1; VARIANTS2; VARIANTS3; VARIANTS4; VARIANTS5 }
 
 process FormatSignature {
 	tag "Prepare for signatures ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/signature", mode: "copy"
 
 	input:
@@ -175,7 +175,7 @@ process FormatSignature {
 	script:
 		output = "${cohort}.in.tsv.gz"
 		"""
-		format-variants --input ${input} --output ${output} \
+		singularity exec ./containers/intogen-core.simg format-variants --input ${input} --output ${output} \
 			--format signature
 		"""
 
@@ -216,7 +216,7 @@ SIGNATURES.into{ SIGNATURES1; SIGNATURES2; SIGNATURES3; SIGNATURES4; SIGNATURES5
 
 process FormatFML {
 	tag "Prepare for FML ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/oncodrivefml", mode: "copy"
 
 	input:
@@ -228,7 +228,7 @@ process FormatFML {
 	script:
 		output = "${cohort}.in.tsv.gz"
 		"""
-		format-variants --input ${input} --output ${output} \
+		singularity exec ./containers/intogen-core.simg format-variants --input ${input} --output ${output} \
 			--format fml
 		"""
 
@@ -260,7 +260,7 @@ process OncodriveFML {
 
 process FormatCLUSTL {
 	tag "Prepare for CLUSTL ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/oncodriveclustl", mode: "copy"
 
 	input:
@@ -272,7 +272,7 @@ process FormatCLUSTL {
 	script:
 		output = "${cohort}.in.tsv.gz"
 		"""
-		format-variants --input ${input} --output ${output} \
+		singularity exec ./containers/intogen-core.simg format-variants --input ${input} --output ${output} \
 			--format clustl
 		"""
 
@@ -321,7 +321,7 @@ process OncodriveCLUSTL {
 
 process FormatDNDSCV {
 	tag "Prepare for DNDSCV ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/dndscv", mode: "copy"
 
 	input:
@@ -333,7 +333,7 @@ process FormatDNDSCV {
 	script:
 		output = "${cohort}.in.tsv.gz"
 		"""
-		format-variants --input ${input} --output ${output} \
+		singularity exec ./containers/intogen-core.simg format-variants --input ${input} --output ${output} \
 			--format dndscv
 		"""
 }
@@ -363,7 +363,7 @@ OUT_DNDSCV.into{ OUT_DNDSCV1; OUT_DNDSCV2 }
 
 process FormatVEP {
 	tag "Prepare for VEP ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/vep", mode: "copy"
 
 	input:
@@ -375,9 +375,9 @@ process FormatVEP {
 	script:
 		output = "${cohort}.in.tsv.gz"
 		"""
-		format-variants --input ${input} --output ${output}.tmp \
+		singularity exec ./containers/intogen-core.simg format-variants --input ${input} --output ${output}.tmp \
 			--format vep
-		sort -k1V -k2n -k3n ${output}.tmp |gzip > ${output}
+		singularity exec ./containers/intogen-core.simg sort -k1V -k2n -k3n ${output}.tmp |gzip > ${output}
 		"""
 
 }
@@ -406,7 +406,7 @@ process VEP {
 
 process ProcessVEPoutput {
 	tag "Process vep output ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/vep", mode: "copy"
 
     input:
@@ -419,7 +419,7 @@ process ProcessVEPoutput {
 	script:
 		output = "${cohort}.tsv.gz"
 		"""
-		parse-vep --input ${input} --output ${output}
+		singularity exec ./containers/intogen-core.simg parse-vep --input ${input} --output ${output}
 		"""
 }
 
@@ -428,7 +428,7 @@ PARSED_VEP.into { PARSED_VEP1; PARSED_VEP2; PARSED_VEP3; PARSED_VEP4; PARSED_VEP
 
 process FilterNonSynonymous {
 	tag "Filter non synonymus ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/nonsynonymous", mode: "copy"
 
     input:
@@ -440,14 +440,14 @@ process FilterNonSynonymous {
 	script:
 		output = "${cohort}.vep_nonsyn.tsv.gz"
 		"""
-		parse-nonsynonymous --input ${input} --output ${output}
+		singularity exec ./containers/intogen-core.simg parse-nonsynonymous --input ${input} --output ${output}
 		"""
 }
 
 
 process FormatSMRegions {
 	tag "Prepare for SMRegions ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/smregions", mode: "copy"
 
 	input:
@@ -459,7 +459,7 @@ process FormatSMRegions {
 	script:
 		output = "${cohort}.in.tsv.gz"
 		"""
-		format-variants --input ${input} --output ${output} \
+		singularity exec ./containers/intogen-core.simg format-variants --input ${input} --output ${output} \
 			--format smregions
 		"""
 }
@@ -493,7 +493,7 @@ OUT_SMREGIONS.into { OUT_SMREGIONS1; OUT_SMREGIONS2 }
 
 process FormatCBaSE {
 	tag "Prepare for CBaSE ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/cbase", mode: "copy"
 
 	input:
@@ -505,7 +505,7 @@ process FormatCBaSE {
 	script:
 		output = "${cohort}.in.tsv"
 		"""
-		format-variants --input ${input} --output ${output} \
+		singularity exec ./containers/intogen-core.simg format-variants --input ${input} --output ${output} \
 			--format cbase
 		"""
 }
@@ -532,7 +532,7 @@ process CBaSE {
 
 process FormatMutPanning {
 	tag "Prepare for MutPanning ${cohort}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/mutpanning", mode: "copy"
 
 	input:
@@ -545,9 +545,9 @@ process FormatMutPanning {
 		muts = "${cohort}.in_muts.tsv"
 		samples = "${cohort}.in_samples.tsv"
 		"""
-		format-variants --input ${input} --output ${muts} \
+		singularity exec ./containers/intogen-core.simg format-variants --input ${input} --output ${muts} \
 			--format mutpanning-mutations
-		format-variants --input ${input} --output ${samples} \
+		singularity exec ./containers/intogen-core.simg format-variants --input ${input} --output ${samples} \
 			--format mutpanning-samples
 		"""
 }
