@@ -28,7 +28,7 @@ process DownloadDatasets {
 
 process ParseInput {
 	tag "Parse input ${input}"
-	label "core"
+	//label "core"
 	publishDir "${STEPS_FOLDER}/inputs", mode: "copy"
 	errorStrategy 'finish'
 	input:
@@ -56,12 +56,12 @@ process ParseInput {
 		    println "Processing local input path: ${input}"
 		    if (file(input).isDirectory() || input.endsWith(".bginfo")) {
 		        """
-		        openvar groupby ${input} --header -g DATASET -q -s 'gzip > \${GROUP_KEY}.parsed.tsv.gz'
+		       singularity exec ./containers openvar groupby ${input} --header -g DATASET -q -s 'gzip > \${GROUP_KEY}.parsed.tsv.gz'
 		        """
 		    } else {
 		        cohort = file(input).baseName.split('\\.')[0]
 		        """
-		        openvar cat ${input} --header | gzip > ${cohort}.parsed.tsv.gz
+		       singularity exec ./containers/intogen-core.simg openvar cat ${input} --header | gzip > ${cohort}.parsed.tsv.gz
 		        """
 		    }
 		}
