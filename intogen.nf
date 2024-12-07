@@ -39,8 +39,7 @@ process ParseInput {
 		path("*.parsed.tsv.gz") into COHORTS
 
 	script:
-		
-		if ( input.toRealPath().toFile().isDirectory() || input.endsWith(".bginfo" )) {
+		if (file(input).isDirectory() || input.endsWith(".bginfo")) {
 			"""
 			singularity exec ./containers/intogen-core.simg openvar groupby ${input} --header -g DATASET -q -s 'gzip > \${GROUP_KEY}.parsed.tsv.gz'
 			"""
