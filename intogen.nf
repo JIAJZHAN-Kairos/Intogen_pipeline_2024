@@ -116,7 +116,7 @@ process LoadGenome {
 
 	input:
 		tuple val(cohort), path(input) from COHORTS3
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), stdout into GENOMES
 
@@ -168,7 +168,7 @@ process FormatSignature {
 
 	input:
 		tuple val(cohort), path(input) from VARIANTS1
-		
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into VARIANTS_SIG
 
@@ -221,7 +221,7 @@ process FormatFML {
 
 	input:
 		tuple val(cohort), path(input) from VARIANTS2
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into VARIANTS_FML
 
