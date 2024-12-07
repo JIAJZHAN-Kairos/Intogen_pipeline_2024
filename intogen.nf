@@ -12,7 +12,7 @@ process DownloadDatasets {
     tag "Download datasets"
 
     output:
-    path "./datasets/" into REFERENCE_FILES
+    path "./*" into REFERENCE_FILES
 
     script:
     """
