@@ -782,7 +782,7 @@ process DriverSummary {
         path (input_vet) from VET.collect()
         path (mutations) from MUTATIONS_SUMMARY
         path (cohortsSummary) from COHORT_SUMMARY
-
+	path referenceFiles from REFERENCE_FILES
     output:
 		path("drivers.tsv") into DRIVERS_SUMMARY
 		path("unique_drivers.tsv") into UNIQUE_DRIVERS
