@@ -70,7 +70,7 @@ process LoadCancer {
 
 	script:
 		"""
-		singularity exec --fakeroot ./containers/intogen-core.simg get_field.sh ${input} CANCER
+		singularity exec ./containers/intogen-core.simg get_field.sh ${input} CANCER
 		"""
 }
 
@@ -89,7 +89,7 @@ process LoadPlatform {
 
 	script:
 		"""
-		singularity exec --fakeroot ./containers/intogen-core.simg get_field.sh ${input} PLATFORM
+		singularity exec ./containers/intogen-core.simg get_field.sh ${input} PLATFORM
 		"""
 }
 
@@ -107,7 +107,7 @@ process LoadGenome {
 
 	script:
 		"""
-		singularity exec --fakeroot ./containers/intogen-core.simg get_field.sh ${input} GENOMEREF
+		singularity exec ./containers/intogen-core.simg get_field.sh ${input} GENOMEREF
 		"""
 }
 
