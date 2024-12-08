@@ -590,9 +590,8 @@ process FormatHotMAPS {
 		"""
 }
 
-process HotMAPS_test {
-	//tag "HotMAPS ${cohort}"
-	tag "Htest ${cohort}"
+process HotMAPS {
+	tag "HotMAPS ${cohort}"
 	publishDir "${STEPS_FOLDER}/hotmaps", mode: "copy"
     input:
         tuple val(cohort), path(input), path(signatures) from VARIANTS_HOTMAPS.join(SIGNATURES4)
@@ -603,10 +602,8 @@ process HotMAPS_test {
 
 	script:
 		"""
-		mkdir -p ./containers/
-    		aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/containers/hotmaps.simg ./containers/ --recursive
 		which python
-		singularity exec --fakeroot ./containers/hotmaps.simg /bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
+		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
 			${params.datasets}/hotmaps ${task.cpus}
 		"""
 }
