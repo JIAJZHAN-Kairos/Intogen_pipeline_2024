@@ -134,9 +134,6 @@ process ProcessVariants {
 	input:
 		tuple val(cohort), path(input), val(platform), val(genome) from COHORTS4.join(PLATFORMS1).join(GENOMES)
 		path referenceFiles from REFERENCE_FILES
-		//tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES).combine(REFERENCE_FILES)
-		//tuple val(cohort), path(input), val(platform), val(genome), path(referenceFiles) from COHORTS4.join(PLATFORMS1).join(GENOMES)
-
 	output:
 		tuple val(cohort), path(output) into VARIANTS
 		tuple val(cohort), path("${output}.stats.json") into STATS_VARIANTS
@@ -238,7 +235,6 @@ process OncodriveFML {
     input:
         tuple val(cohort), path(input), path(signature)  from VARIANTS_FML.join(SIGNATURES1)
 	path referenceFiles from REFERENCE_FILES
-        //path regions from REGIONS
     output:
         tuple val(cohort), path("out/*.tsv.gz") into OUT_ONCODRIVEFML
 
@@ -281,7 +277,6 @@ process OncodriveCLUSTL {
 	
     input:
         tuple val(cohort), path(input), path(signature), val(cancer) from VARIANTS_CLUSTL.join(SIGNATURES2).join(CANCERS1)
-        //path regions from REGIONS
 	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path("${cohort}.elements_results.txt") into OUT_ONCODRIVECLUSTL
@@ -467,7 +462,6 @@ process SMRegions {
 
     input:
         tuple val(cohort), path(input), path(signature)  from VARIANTS_SMREGIONS.join(SIGNATURES3)
-        //path regions from REGIONS
 	path referenceFiles from REFERENCE_FILES
     output:
         tuple val(cohort), path(output) into OUT_SMREGIONS
@@ -602,7 +596,6 @@ process HotMAPS {
 
 	script:
 		"""
-		which python
 		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
 			${params.datasets}/hotmaps ${task.cpus}
 		"""
