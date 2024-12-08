@@ -70,7 +70,7 @@ process LoadCancer {
 
 	script:
 		"""
-		singularity exec ./containers/intogen-core.simg get_field.sh ${input} CANCER
+		singularity exec --no-privs ./containers/intogen-core.simg get_field.sh ${input} CANCER
 		"""
 }
 
