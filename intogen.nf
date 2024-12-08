@@ -850,4 +850,26 @@ process FilterMNVS {
 }
 
 
+process ListCurrentDirectory {
+    tag "List current directory"
+    publishDir "${STEPS_FOLDER}/directory_listing", mode: "copy"
+    label "core"
+
+    input:
+        val STEPS_FOLDER // Ensure the folder context is available
+
+    output:
+        path("directory_listing.txt") into DIRECTORY_LISTING
+
+    script:
+        """
+        echo "Current working directory:" > directory_listing.txt
+        pwd
+        echo "Files in the directory:" >> directory_listing.txt
+        ls
+        """
+}
+
+
+
 
