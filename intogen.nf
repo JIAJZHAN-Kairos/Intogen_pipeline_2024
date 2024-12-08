@@ -89,7 +89,7 @@ process LoadPlatform {
 
 	script:
 		"""
-		singularity exec ./containers/intogen-core.simg get_field.sh ${input} PLATFORM
+		singularity exec --no-privs ./containers/intogen-core.simg get_field.sh ${input} PLATFORM
 		"""
 }
 
@@ -107,7 +107,7 @@ process LoadGenome {
 
 	script:
 		"""
-		singularity exec ./containers/intogen-core.simg get_field.sh ${input} GENOMEREF
+		singularity exec --no-privs ./containers/intogen-core.simg get_field.sh ${input} GENOMEREF
 		"""
 }
 
