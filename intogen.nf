@@ -864,9 +864,8 @@ process UploadOutputFiles {
     """
     ls
     pwd
-    //aws s3 cp ${params.output}/ s3://org.umccr.nf-tower.general/intogen-plus-2024/ --recursive
     mkdir -p ./temp_output
-    cp -r ${outputFolder} ./temp_output
+    cp -r ${referenceFiles} ./temp_output
     ls output_12.09_test
     aws s3 cp ./temp_output/ s3://org.umccr.nf-tower.general/intogen-plus-2024/output_12.9_test/ --recursive
     """
