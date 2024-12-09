@@ -859,7 +859,7 @@ process UploadOutputFiles {
 
     input:
     path referenceFiles from REFERENCE_FILES
-    path (driver) from DRIVERS_SUMMARY
+    path("*.vep.gz") from DRIVERS_SATURATION
     script:
     """
     aws s3 cp ${params.output}/ s3://org.umccr.nf-tower.general/intogen-plus-2024/ --recursive
