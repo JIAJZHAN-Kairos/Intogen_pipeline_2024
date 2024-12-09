@@ -856,24 +856,16 @@ process FilterMNVS {
 }
 
 
-process ListCurrentDirectory {
-    tag "List current directory"
-    publishDir "${STEPS_FOLDER}/directory_listing", mode: "copy"
-    label "core"
+workflow.onComplete {
+    process UploadOutputFiles {
+        tag "Upload output files to S3"
+        label "core"
 
-    input:
-        val STEPS_FOLDER // Ensure the folder context is available
-
-    output:
-        path("directory_listing.txt") into DIRECTORY_LISTING
-
-    script:
+        script:
         """
-        echo "Current working directory:" > directory_listing.txt
-        pwd
-        echo "Files in the directory:" >> directory_listing.txt
-        ls
+        aws s3 cp ${params.output}/ s3://org.umccr.nf-tower.general/intogen-plus-2024/ --recursive
         """
+    }
 }
 
 
