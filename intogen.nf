@@ -855,12 +855,17 @@ process FilterMNVS {
 		"""
 }
 
+Channel
+    .merge(DRIVERS_SUMMARY, UNIQUE_DRIVERS, UNFILTER_DRIVERS, MNVS_FILTER)
+    .set { ALL_DONE }
 
 workflow.onComplete {
     process UploadOutputFiles {
         tag "Upload output files to S3"
         label "core"
-
+    input:
+        val trigger from ALL_DONE
+	path referenceFiles from REFERENCE_FILES
         script:
         """
         aws s3 cp ${params.output}/ s3://org.umccr.nf-tower.general/intogen-plus-2024/ --recursive
