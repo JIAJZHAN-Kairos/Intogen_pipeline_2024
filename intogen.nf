@@ -12,13 +12,19 @@ process DownloadDatasets {
     tag "Download datasets"
     label "core"
 
+    input:
+    path OUTPUT from file(params.output)
+
     output:
-    path "./datasets/" into REFERENCE_FILES
+    path "./*" into REFERENCE_FILES
 
     script:
     """
     mkdir -p ./datasets/
     aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ ./datasets/ --recursive
+    mkdir -p ./config/
+    aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/./config/annotations.txt ./config/
+    mkdir -p ${params.output}/
     """
     }
 
