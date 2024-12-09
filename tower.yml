@@ -1,0 +1,9 @@
+reports:
+  "report.html":
+    display: "Nextflow execution report"
+  "timeline.html":
+    display: "Nextflow execution timeline"
+  "trace.txt":
+    display: "Nextflow trace file"
+  "dag.html":
+    display: "Nextflow workflow diagram"
