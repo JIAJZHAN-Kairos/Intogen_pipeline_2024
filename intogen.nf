@@ -12,9 +12,6 @@ process DownloadDatasets {
     tag "Download datasets"
     label "core"
 
-    input:
-    path OUTPUT from file(params.output)
-
     output:
     path "./*" into REFERENCE_FILES
 
