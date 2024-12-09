@@ -852,9 +852,7 @@ process FilterMNVS {
 		"""
 }
 
-Channel
-    .merge(DRIVERS_SUMMARY, UNIQUE_DRIVERS, UNFILTER_DRIVERS, MNVS_FILTER)
-    .set { ALL_DONE }
+ALL_DONE = Channel.merge(DRIVERS_SUMMARY, UNIQUE_DRIVERS, UNFILTER_DRIVERS, MNVS_FILTER)
 
 workflow.onComplete {
     process UploadOutputFiles {
