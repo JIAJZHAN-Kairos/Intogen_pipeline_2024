@@ -858,13 +858,17 @@ process UploadOutputFiles {
     label "core"
 
     input:
-    path referenceFiles from REFERENCE_FILES
+    //path referenceFiles from REFERENCE_FILES
+    path outputFolder from REFERENCE_FILES.filter { it.name == params.output.tokenize('/')[-1] }
     path("*.vep.gz") from DRIVERS_SATURATION
     script:
     """
     ls ./output_12.09_test
     ls ./datasets/
     //aws s3 cp ${params.output}/ s3://org.umccr.nf-tower.general/intogen-plus-2024/ --recursive
+    mkdir -p ./temp_output
+    cp -r ${outputFolder} ./temp_output
+    aws s3 cp ./temp_output/ s3://org.umccr.nf-tower.general/intogen-plus-2024/output_12.9_test/ --recursive
     """
 }
 
