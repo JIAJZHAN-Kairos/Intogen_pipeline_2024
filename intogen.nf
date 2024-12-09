@@ -21,7 +21,6 @@ process DownloadDatasets {
     aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ ./datasets/ --recursive
     mkdir -p ./config/
     aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/config/annotations.txt ./config/
-    mkdir -p ${params.output}/
     """
     }
 
@@ -850,25 +849,6 @@ process FilterMNVS {
 		parse-mnvs ${input}
 
 		"""
-}
-
-
-process UploadOutputFiles {
-    tag "Upload output files to S3"
-    label "core"
-
-    input:
-    path referenceFiles from REFERENCE_FILES
-    path("*.vep.gz") from DRIVERS_SATURATION
-    script:
-    """
-    ls
-    pwd
-    mkdir -p ./temp_output
-    cp -r ${referenceFiles} ./temp_output
-    ls output_12.09_test
-    aws s3 cp ./temp_output/ s3://org.umccr.nf-tower.general/intogen-plus-2024/output_12.9_test/ --recursive
-    """
 }
 
 
