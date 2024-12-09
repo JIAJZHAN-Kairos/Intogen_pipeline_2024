@@ -863,8 +863,8 @@ process UploadOutputFiles {
     path("*.vep.gz") from DRIVERS_SATURATION
     script:
     """
-    ls ./output_12.09_test
-    ls ./datasets/
+    ls
+    pwd
     //aws s3 cp ${params.output}/ s3://org.umccr.nf-tower.general/intogen-plus-2024/ --recursive
     mkdir -p ./temp_output
     cp -r ${outputFolder} ./temp_output
