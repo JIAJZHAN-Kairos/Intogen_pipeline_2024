@@ -857,7 +857,8 @@ process UploadOutputFiles {
     tag "Upload output files to S3"
     script:
     """
-    aws s3 cp /org.umccr.nf-tower.general/intogen-plus-2024/output12.10/ s3://org.umccr.nf-tower.general/intogen-plus-2024/output12.10/ --recursive
+    ls
+    pwd
     """
 }
 
