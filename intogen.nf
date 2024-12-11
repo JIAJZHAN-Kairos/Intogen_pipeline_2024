@@ -1,8 +1,8 @@
 nextflow.enable.dsl=1
 // Set here a list of files or directories to use. E.g. Channel.fromPath(["/path/*", "/path2/file"], type: 'any')
 INPUT = Channel.fromPath(params.input.tokenize())
-OUTPUT = file(params.output)
-STEPS_FOLDER = file(params.stepsFolder)
+OUTPUT = params.output
+STEPS_FOLDER = params.stepsFolder
 ANNOTATIONS = Channel.value(params.annotations)
 REGIONS = Channel.value("${params.datasets}/regions/cds.regions.gz")
 
