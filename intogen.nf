@@ -853,14 +853,3 @@ process FilterMNVS {
 
 
 
-process UploadOutputFiles {
-    tag "Upload output files to S3"
-    script:
-    """
-    ls
-    pwd
-    """
-}
-
-
-
