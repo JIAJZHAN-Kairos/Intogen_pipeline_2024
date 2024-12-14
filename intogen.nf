@@ -320,7 +320,7 @@ process FormatDNDSCV {
 
 	input:
 		tuple val(cohort), path(input) from VARIANTS4
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into VARIANTS_DNDSCV
 
