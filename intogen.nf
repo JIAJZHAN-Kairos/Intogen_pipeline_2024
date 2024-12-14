@@ -362,7 +362,7 @@ process FormatVEP {
 
 	input:
 		tuple val(cohort), path(input) from VARIANTS5
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into VARIANTS_VEP
 
@@ -446,7 +446,7 @@ process FormatSMRegions {
 
 	input:
 		tuple val(cohort), path(input) from PARSED_VEP_NONSYNONYMOUS
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into VARIANTS_SMREGIONS
 
@@ -530,7 +530,7 @@ process FormatMutPanning {
 
 	input:
 		tuple val(cohort), path(input) from PARSED_VEP3
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(muts), path(samples) into VARIANTS_MUTPANNING
 
@@ -574,7 +574,7 @@ process FormatHotMAPS {
 
 	input:
 		tuple val(cohort), path(input) from PARSED_VEP4
-
+		path referenceFiles from REFERENCE_FILES
 	output:
 		tuple val(cohort), path(output) into VARIANTS_HOTMAPS
 
