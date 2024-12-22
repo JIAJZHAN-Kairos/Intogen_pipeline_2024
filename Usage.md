@@ -71,11 +71,13 @@ Once the parameters are configured, click 'Launch' to start the pipeline. You ca
 
 By default this pipeline outputs 4 files:
 
-* *`cohorts.tsv`:* summary of the cohorts that have been analyzed
-* *`drivers.tsv`:* summary of the results of the driver discovery by cohort
-* *`mutations.tsv`:* summary of all the mutations analyzed by cohort
-* `unique_drivers.tsv`: information on the genes reported as drivers (in any cohort)
-* `unfiltered_drivers.tsv`: information on the filters applied to the post-processing step: from the output of the combination to the final set of driver genes.
+| **File Name**            | **Description**                                                                                   |
+|---------------------------|---------------------------------------------------------------------------------------------------|
+| `cohorts.tsv`            | Summary of the cohorts that have been analyzed.                                                  |
+| `drivers.tsv`            | Summary of the results of the driver discovery by cohort.                                        |
+| `mutations.tsv`          | Summary of all the mutations analyzed by cohort.                                                 |
+| `unique_drivers.tsv`     | Information on the genes reported as drivers (in any cohort).                                    |
+| `unfiltered_drivers.tsv` | Information on the filters applied during the post-processing step: from the combination output to the final set of driver genes. |
 Those files can be found in the path indicated with the --output options.
 The output of each tools can be found in the step folder.
 #### Output Explanation
