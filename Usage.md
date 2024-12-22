@@ -44,7 +44,7 @@ Example:
 ```
 pattern:
 
-- 'combined-somatic-PASS.tsv' # The file name of your inpute data
+- 'combined-somatic-PASS.tsv' # The file name of your input data
 recursive: false
 format: tsv # The file format of your input data(e. g. tsv, csv, vcf, maf, bed)
 ```
