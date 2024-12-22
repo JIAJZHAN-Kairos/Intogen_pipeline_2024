@@ -78,6 +78,7 @@ By default this pipeline outputs 4 files:
 | `mutations.tsv`          | Summary of all the mutations analyzed by cohort.                                                 |
 | `unique_drivers.tsv`     | Information on the genes reported as drivers (in any cohort).                                    |
 | `unfiltered_drivers.tsv` | Information on the filters applied during the post-processing step: from the combination output to the final set of driver genes. |
+
 Those files can be found in the path indicated with the --output options.
 The output of each tools can be found in the step folder.
 #### Output Explanation
