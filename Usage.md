@@ -232,7 +232,9 @@ Excess of splice site mutations observed.
 
 ## Reference
 1.     For more details, please refer to the [IntOGen Documentation](https://intogen-plus.readthedocs.io/en/v2024/index.html) 
+
 2.     Gonzalez-Perez, A.*, et al.* IntOGen-mutations identifies cancer drivers across tumor types. *Nat Methods* 2013;10(11):1081-1082.
+
 3.     Martinez-Jimenez, F.*, et al.* A compendium of mutational cancer driver genes. *Nat Rev Cancer* 2020;20(10):555-572.
 
 ⠀
