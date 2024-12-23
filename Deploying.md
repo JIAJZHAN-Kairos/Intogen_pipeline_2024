@@ -1,6 +1,9 @@
 # A Comprehensive Guide to Deploying IntOGen on Seqera
+
 Jiajun Zhan
+
 Collaborative Centre for Genomic Cancer Medicine
+
 [jiajun.zhan.1@.unimelb.edu.au](jiajun.zhan.1@.unimelb.edu.au)
 
 ## 1. Introduction
