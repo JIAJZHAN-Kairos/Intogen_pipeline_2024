@@ -230,6 +230,17 @@ Excess of splice site mutations observed.
 5. Complex Output Files
    * The output is detailed but complex, making it challenging for beginners to interpret the numerous fields and warning messages, thus requiring a learning curve.
 
+## Running test
+Navigate to Launchpad and locate the IntOGen_Pipeline_2024 project.
+Utilize the default parameter value.
+```
+{
+"input": "s3://org.umccr.nf-tower.general/intogen-plus-2024/test/",
+"output": "s3://org.umccr.nf-tower.general/intogen-plus-2024/output_test/"
+}
+```
+Subsequently, click the Launch button. The execution time is approximately 5 hours. After, you can locate the output at ￼ ￼`S3://org.umccr.nf-tower.general/intogen-plus-2024/output_test/￼`
+
 ## Reference
 1.     For more details, please refer to the [IntOGen Documentation](https://intogen-plus.readthedocs.io/en/v2024/index.html) 
 
