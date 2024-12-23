@@ -4,9 +4,9 @@ IntOGen have set up on Seqera, you don’t need to install the pipeline and buil
 ## Usage
 ![](Usage/image.png)
 Firstly, navigate to Launchpad, find IntOGen_Pipeline_2024, click Launch.
-The primary customizaon involves modifying the pipeline parameters:
+The primary customization involves modifying the pipeline parameters:
 ![](Usage/image%202.png)
-The parameters need to follow JSON or YAML- format, it’s beter only edit the input and output path based on the original one.
+The parameters need to follow JSON or YAML- format, it’s better only edit the input and output path based on the original one.
 You can add seed too. Seed to be used for reproducibility. This applies to 4 methods: smRegions, OncodriveCLUSTL, OncodriveFML, dNdScv.
 An example configuraon is shown below:
 ```
@@ -64,7 +64,7 @@ format: tsv # The file format of your input data(e. g. tsv, csv, vcf, maf, bed)
 ```
 - type: static
   field: DATASET
-  value: # Edite to your cohort’s name
+  value: # Edit to your cohort’s name
 ```
 Once the parameters are configured, click 'Launch' to start the pipeline. You can monitor the task progress in the run channel.
 ### Output
