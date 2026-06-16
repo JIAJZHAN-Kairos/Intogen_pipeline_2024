@@ -18,9 +18,9 @@ process DownloadDatasets {
     script:
     """
     mkdir -p ./datasets/
-    aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/datasets/ ./datasets/ --recursive
+    aws s3 cp s3://grimmond-research-nextflow-980504796380-ap-southeast-2-an/intogen-plus-2024/datasets/ ./datasets/ --recursive
     mkdir -p ./config/
-    aws s3 cp s3://org.umccr.nf-tower.general/intogen-plus-2024/config/annotations.txt ./config/
+    aws s3 cp s3://grimmond-research-nextflow-980504796380-ap-southeast-2-an/intogen-plus-2024/config/annotations.txt ./config/
     """
     }
 
