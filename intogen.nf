@@ -1,11 +1,11 @@
-nextflow.enable.dsl=1
+nextflow.enable.dsl=2
+
 // Set here a list of files or directories to use. E.g. Channel.fromPath(["/path/*", "/path2/file"], type: 'any')
-INPUT = Channel.fromPath(params.input.tokenize())
 OUTPUT = params.output
 STEPS_FOLDER = params.stepsFolder
-ANNOTATIONS = Channel.value(params.annotations)
-REGIONS = Channel.value("${params.datasets}/regions/cds.regions.gz")
 
+CUTOFFS = ['WXS': 1000, 'WGS': 10000]
+REGIONS_PREFIX = ['WXS': 'cds', 'WGS': 'wg']
 
 
 process DownloadDatasets {
@@ -13,7 +13,7 @@ process DownloadDatasets {
     label "core"
 
     output:
-    path "./*" into REFERENCE_FILES
+    path "./*"
 
     script:
     """
@@ -31,14 +31,14 @@ process ParseInput {
 	publishDir "${STEPS_FOLDER}/inputs", mode: "copy"
 	errorStrategy 'finish'
 	input:
-		path input from INPUT
-		path annotations from ANNOTATIONS
+		path input
+		path annotations
 
 	output:
-		path("*.parsed.tsv.gz") into COHORTS
+		path("*.parsed.tsv.gz")
 
 	script:
-		
+
 		if (input.startsWith("s3://")) {
 		    println "Processing S3 input path: ${input}"
 		    if (input.endsWith(".bginfo")) {
@@ -67,20 +67,15 @@ process ParseInput {
 }
 
 
-COHORTS
-	.flatten()
-	.map{it -> [it.baseName.split('\\.')[0], it]}
-	.into{ COHORTS1; COHORTS2; COHORTS3; COHORTS4; COHORTS5 }
-
 process LoadCancer {
 	tag "Load cancer type ${cohort}"
 	label "core"
 
 	input:
-		tuple val(cohort), path(input) from COHORTS1
+		tuple val(cohort), path(input)
 
 	output:
-		tuple val(cohort), stdout into CANCERS
+		tuple val(cohort), stdout
 
 	script:
 		"""
@@ -88,18 +83,16 @@ process LoadCancer {
 		"""
 }
 
-CANCERS.into { CANCERS1; CANCERS2; CANCERS3 }
-
 
 process LoadPlatform {
 	tag "Load sequencing platform ${cohort}"
 	label "core"
 
 	input:
-		tuple val(cohort), path(input) from COHORTS2
+		tuple val(cohort), path(input)
 
 	output:
-		tuple val(cohort), stdout into PLATFORMS
+		tuple val(cohort), stdout
 
 	script:
 		"""
@@ -107,25 +100,21 @@ process LoadPlatform {
 		"""
 }
 
-PLATFORMS.into { PLATFORMS1; PLATFORMS2; PLATFORMS3 }
-
 process LoadGenome {
 	tag "Load reference genome ${cohort}"
 	label "core"
 
 	input:
-		tuple val(cohort), path(input) from COHORTS3
+		tuple val(cohort), path(input)
 
 	output:
-		tuple val(cohort), stdout into GENOMES
+		tuple val(cohort), stdout
 
 	script:
 		"""
 		get_field.sh ${input} GENOMEREF
 		"""
 }
-
-CUTOFFS = ['WXS': 1000, 'WGS': 10000]
 
 process ProcessVariants {
 	tag "Process variants ${cohort}"
@@ -134,11 +123,11 @@ process ProcessVariants {
 	publishDir "${STEPS_FOLDER}/variants", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input), val(platform), val(genome) from COHORTS4.join(PLATFORMS1).join(GENOMES)
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input), val(platform), val(genome)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS
-		tuple val(cohort), path("${output}.stats.json") into STATS_VARIANTS
+		tuple val(cohort), path(output), emit: variants
+		tuple val(cohort), path("${output}.stats.json"), emit: stats
 
 	script:
 		cutoff = CUTOFFS[platform]
@@ -154,8 +143,6 @@ process ProcessVariants {
 
 }
 
-VARIANTS.into { VARIANTS1; VARIANTS2; VARIANTS3; VARIANTS4; VARIANTS5 }
-
 
 process FormatSignature {
 	tag "Prepare for signatures ${cohort}"
@@ -163,10 +150,10 @@ process FormatSignature {
 	publishDir "${STEPS_FOLDER}/signature", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from VARIANTS1
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS_SIG
+		tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.in.tsv.gz"
@@ -177,7 +164,6 @@ process FormatSignature {
 
 }
 
-REGIONS_PREFIX = ['WXS': 'cds', 'WGS': 'wg']
 
 process ComputeProfile {
 	tag "ComputeProfile ${cohort}"
@@ -185,10 +171,10 @@ process ComputeProfile {
 	publishDir "${STEPS_FOLDER}/signature", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input), val(platform) from VARIANTS_SIG.join(PLATFORMS2)
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input), val(platform)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into SIGNATURES
+		tuple val(cohort), path(output)
 
 	script:
 		prefix = REGIONS_PREFIX[platform]
@@ -207,8 +193,6 @@ process ComputeProfile {
 
 }
 
-SIGNATURES.into{ SIGNATURES1; SIGNATURES2; SIGNATURES3; SIGNATURES4; SIGNATURES5 }
-
 
 process FormatFML {
 	tag "Prepare for FML ${cohort}"
@@ -216,10 +200,10 @@ process FormatFML {
 	publishDir "${STEPS_FOLDER}/oncodrivefml", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from VARIANTS2
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS_FML
+		tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.in.tsv.gz"
@@ -235,10 +219,10 @@ process OncodriveFML {
     publishDir "${STEPS_FOLDER}/oncodrivefml", mode: "copy"
 
     input:
-        tuple val(cohort), path(input), path(signature)  from VARIANTS_FML.join(SIGNATURES1)
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(input), path(signature)
+	path referenceFiles
     output:
-        tuple val(cohort), path("out/*.tsv.gz") into OUT_ONCODRIVEFML
+        tuple val(cohort), path("out/*.tsv.gz")
 
 	script:
 		seedOpt = (params.seed == null)? '': "--seed ${params.seed}"
@@ -259,10 +243,10 @@ process FormatCLUSTL {
 	publishDir "${STEPS_FOLDER}/oncodriveclustl", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from VARIANTS3
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS_CLUSTL
+		tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.in.tsv.gz"
@@ -276,13 +260,13 @@ process FormatCLUSTL {
 process OncodriveCLUSTL {
     tag "OncodriveCLUSTL ${cohort}"
     publishDir "${STEPS_FOLDER}/oncodriveclustl", mode: "copy"
-	
+
     input:
-        tuple val(cohort), path(input), path(signature), val(cancer) from VARIANTS_CLUSTL.join(SIGNATURES2).join(CANCERS1)
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(input), path(signature), val(cancer)
+	path referenceFiles
     output:
-        tuple val(cohort), path("${cohort}.elements_results.txt") into OUT_ONCODRIVECLUSTL
-        tuple val(cohort), path("${cohort}.clusters_results.tsv") into OUT_ONCODRIVECLUSTL_CLUSTERS
+        tuple val(cohort), path("${cohort}.elements_results.txt"), emit: elements
+        tuple val(cohort), path("${cohort}.clusters_results.tsv"), emit: clusters
 
 	script:
 		seedOpt = (params.seed == null)? '': "--seed ${params.seed}"
@@ -295,7 +279,7 @@ process OncodriveCLUSTL {
 				--concatenate \
 				-c ${task.cpus} \
 				-o ${cohort} ${seedOpt} ${debugOpt}
-			
+
 			mv ${cohort}/elements_results.txt ${cohort}.elements_results.txt
 			mv ${cohort}/clusters_results.tsv ${cohort}.clusters_results.tsv
 			"""
@@ -308,7 +292,7 @@ process OncodriveCLUSTL {
 				-o ${cohort} ${seedOpt} ${debugOpt}
 
 			mv ${cohort}/elements_results.txt ${cohort}.elements_results.txt
-			mv ${cohort}/clusters_results.tsv ${cohort}.clusters_results.tsv	
+			mv ${cohort}/clusters_results.tsv ${cohort}.clusters_results.tsv
 			"""
 }
 
@@ -319,10 +303,10 @@ process FormatDNDSCV {
 	publishDir "${STEPS_FOLDER}/dndscv", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from VARIANTS4
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS_DNDSCV
+		tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.in.tsv.gz"
@@ -337,12 +321,12 @@ process dNdScv {
     publishDir "${STEPS_FOLDER}/dndscv", mode: "copy"
 
     input:
-        tuple val(cohort), path(input) from VARIANTS_DNDSCV
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(input)
+	path referenceFiles
     output:
-        tuple val(cohort), path("${cohort}.dndscv.tsv.gz") into OUT_DNDSCV
-        tuple val(cohort), path("${cohort}.dndscv_annotmuts.tsv.gz") into OUT_DNDSCV_ANNOTMUTS
-        tuple val(cohort), path("${cohort}.dndscv_genemuts.tsv.gz") into OUT_DNDSCV_GENEMUTS
+        tuple val(cohort), path("${cohort}.dndscv.tsv.gz"), emit: dndscv
+        tuple val(cohort), path("${cohort}.dndscv_annotmuts.tsv.gz"), emit: annotmuts
+        tuple val(cohort), path("${cohort}.dndscv_genemuts.tsv.gz"), emit: genemuts
 
 	script:
 		"""
@@ -353,18 +337,16 @@ process dNdScv {
 		"""
 }
 
-OUT_DNDSCV.into{ OUT_DNDSCV1; OUT_DNDSCV2 }
-
 process FormatVEP {
 	tag "Prepare for VEP ${cohort}"
 	label "core"
 	publishDir "${STEPS_FOLDER}/vep", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from VARIANTS5
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS_VEP
+		tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.in.tsv.gz"
@@ -379,12 +361,12 @@ process FormatVEP {
 process VEP {
 	tag "VEP ${cohort}"
 	publishDir "${STEPS_FOLDER}/vep", mode: "copy"
-	
+
     input:
-        tuple val(cohort), path(input) from VARIANTS_VEP
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(input)
+	path referenceFiles
     output:
-        tuple val(cohort), path(output) into OUT_VEP
+        tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.vep.tsv.gz"
@@ -404,11 +386,11 @@ process ProcessVEPoutput {
 	publishDir "${STEPS_FOLDER}/vep", mode: "copy"
 
     input:
-        tuple val(cohort), path(input) from OUT_VEP
+        tuple val(cohort), path(input)
 
     output:
-        tuple val(cohort), path(output) into PARSED_VEP
-        tuple val(cohort), path("${output}.stats.json") into STATS_VEP
+        tuple val(cohort), path(output), emit: parsed
+        tuple val(cohort), path("${output}.stats.json"), emit: stats
 
 	script:
 		output = "${cohort}.tsv.gz"
@@ -418,18 +400,16 @@ process ProcessVEPoutput {
 }
 
 
-PARSED_VEP.into { PARSED_VEP1; PARSED_VEP2; PARSED_VEP3; PARSED_VEP4; PARSED_VEP5; PARSED_VEP6; PARSED_VEP7 }
-
 process FilterNonSynonymous {
 	tag "Filter non synonymus ${cohort}"
 	label "core"
 	publishDir "${STEPS_FOLDER}/nonsynonymous", mode: "copy"
 
     input:
-        tuple val(cohort), path(input) from PARSED_VEP1
+        tuple val(cohort), path(input)
 
     output:
-        tuple val(cohort), path(output) into PARSED_VEP_NONSYNONYMOUS
+        tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.vep_nonsyn.tsv.gz"
@@ -445,10 +425,10 @@ process FormatSMRegions {
 	publishDir "${STEPS_FOLDER}/smregions", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from PARSED_VEP_NONSYNONYMOUS
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS_SMREGIONS
+		tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.in.tsv.gz"
@@ -463,10 +443,10 @@ process SMRegions {
 	publishDir "${STEPS_FOLDER}/smregions", mode: "copy"
 
     input:
-        tuple val(cohort), path(input), path(signature)  from VARIANTS_SMREGIONS.join(SIGNATURES3)
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(input), path(signature)
+	path referenceFiles
     output:
-        tuple val(cohort), path(output) into OUT_SMREGIONS
+        tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.smregions.tsv.gz"
@@ -481,8 +461,6 @@ process SMRegions {
 		"""
 }
 
-OUT_SMREGIONS.into { OUT_SMREGIONS1; OUT_SMREGIONS2 }
-
 
 process FormatCBaSE {
 	tag "Prepare for CBaSE ${cohort}"
@@ -490,10 +468,10 @@ process FormatCBaSE {
 	publishDir "${STEPS_FOLDER}/cbase", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from PARSED_VEP2
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS_CBASE
+		tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.in.tsv"
@@ -508,10 +486,10 @@ process CBaSE {
 	publishDir "${STEPS_FOLDER}/cbase", mode: "copy"
 
     input:
-        tuple val(cohort), path(input) from VARIANTS_CBASE
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(input)
+	path referenceFiles
     output:
-        tuple val(cohort), path(output) into OUT_CBASE
+        tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.cbase.tsv.gz"
@@ -529,10 +507,10 @@ process FormatMutPanning {
 	publishDir "${STEPS_FOLDER}/mutpanning", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from PARSED_VEP3
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(muts), path(samples) into VARIANTS_MUTPANNING
+		tuple val(cohort), path(muts), path(samples)
 
 	script:
 		muts = "${cohort}.in_muts.tsv"
@@ -550,10 +528,10 @@ process MutPanning {
 	publishDir "${STEPS_FOLDER}/mutpanning", mode: "copy"
 
     input:
-        tuple val(cohort), path(mutations), path(samples) from VARIANTS_MUTPANNING
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(mutations), path(samples)
+	path referenceFiles
     output:
-        tuple val(cohort), path("out/SignificanceFiltered/Significance${cohort}.txt") into OUT_MUTPANNING
+        tuple val(cohort), path("out/SignificanceFiltered/Significance${cohort}.txt")
 
 	script:
 		// TODO remove the creation of the out file or move to the container
@@ -573,10 +551,10 @@ process FormatHotMAPS {
 	publishDir "${STEPS_FOLDER}/hotmaps", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from PARSED_VEP4
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS_HOTMAPS
+		tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.in.maf"
@@ -590,11 +568,11 @@ process HotMAPS {
 	tag "HotMAPS ${cohort}"
 	publishDir "${STEPS_FOLDER}/hotmaps", mode: "copy"
     input:
-        tuple val(cohort), path(input), path(signatures) from VARIANTS_HOTMAPS.join(SIGNATURES4)
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(input), path(signatures)
+	path referenceFiles
     output:
-        tuple val(cohort), path("*.out.gz") into OUT_HOTMAPS
-        tuple val(cohort), path("*.clusters.gz") into OUT_HOTMAPS_CLUSTERS
+        tuple val(cohort), path("*.out.gz"), emit: hotmaps
+        tuple val(cohort), path("*.clusters.gz"), emit: clusters
 
 	script:
 		"""
@@ -609,10 +587,10 @@ process Combination {
 	publishDir "${STEPS_FOLDER}/combination", mode: "copy"
 
     input:
-        tuple val(cohort), path(fml), path(clustl), path(dndscv), path(smregions), path(cbase), path(mutpanning), path(hotmaps) from OUT_ONCODRIVEFML.join(OUT_ONCODRIVECLUSTL).join(OUT_DNDSCV1).join(OUT_SMREGIONS1).join(OUT_CBASE).join(OUT_MUTPANNING).join(OUT_HOTMAPS)
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(fml), path(clustl), path(dndscv), path(smregions), path(cbase), path(mutpanning), path(hotmaps)
+	path referenceFiles
     output:
-        tuple val(cohort), path("${cohort}.05.out.gz") into OUT_COMBINATION
+        tuple val(cohort), path("${cohort}.05.out.gz")
 
 	script:
 		"""
@@ -635,10 +613,10 @@ process FormatdeconstructSigs {
 	publishDir "${STEPS_FOLDER}/deconstructSigs", mode: "copy"
 
 	input:
-		tuple val(cohort), path(input) from PARSED_VEP5
-		path referenceFiles from REFERENCE_FILES
+		tuple val(cohort), path(input)
+		path referenceFiles
 	output:
-		tuple val(cohort), path(output) into VARIANTS_DECONSTRUCTSIGS
+		tuple val(cohort), path(output)
 
 	script:
 		output = "${cohort}.in.tsv.gz"
@@ -648,18 +626,16 @@ process FormatdeconstructSigs {
 		"""
 }
 
-VARIANTS_DECONSTRUCTSIGS.into{ VARIANTS_DECONSTRUCTSIGS1; VARIANTS_DECONSTRUCTSIGS2 }
-
 process deconstructSigs {
 	tag "deconstructSigs ${cohort}"
 	publishDir "${STEPS_FOLDER}/deconstructSigs", mode: "copy"
 
     input:
-        tuple val(cohort), path(input) from VARIANTS_DECONSTRUCTSIGS1
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(input)
+	path referenceFiles
     output:
-        tuple val(cohort), path(output) into OUT_DECONSTRUCTSIGS
-        tuple val(cohort), path("*.signature_likelihood") into OUT_DECONSTRUCTSIGS_SIGLIKELIHOOD
+        tuple val(cohort), path(output), emit: weights
+        tuple val(cohort), path("*.signature_likelihood"), emit: likelihood
 
 	script:
 		output = "${cohort}.deconstructsigs.tsv.gz"
@@ -680,10 +656,10 @@ process CohortCounts {
 	tag "Count variants ${cohort}"
         label "core"
     input:
-        tuple val(cohort), path(input), val(cancer), val(platform) from COHORTS5.join(CANCERS2).join(PLATFORMS3)
+        tuple val(cohort), path(input), val(cancer), val(platform)
 
     output:
-		tuple val(cohort), path("*.counts") into COHORT_COUNTS
+		tuple val(cohort), path("*.counts")
 
 	script:
 		"""
@@ -693,18 +669,15 @@ process CohortCounts {
 		"""
 }
 
-COHORT_COUNTS.into{ COHORT_COUNTS1; COHORT_COUNTS2 }
-COHORT_COUNTS_LIST = COHORT_COUNTS1.map{ it -> it[1] }
-
 process CohortSummary {
 	tag "Count variants"
 	publishDir "${OUTPUT}", mode: "copy"
 
     input:
-        path(input) from COHORT_COUNTS_LIST.collect()
-	path referenceFiles from REFERENCE_FILES
+        path(input)
+	path referenceFiles
     output:
-		path(output) into COHORT_SUMMARY
+		path(output)
 
 	script:
 		output="cohorts.tsv"
@@ -715,18 +688,16 @@ process CohortSummary {
 }
 
 
-MUTATIONS_INPUTS = PARSED_VEP6.map { it -> it[1] }
-
 process MutationsSummary {
 	tag "Mutations"
 	publishDir "${OUTPUT}", mode: "copy"
 	label "core"
 
     input:
-        path(input) from MUTATIONS_INPUTS.collect()
+        path(input)
 
     output:
-		path(output) into MUTATIONS_SUMMARY
+		path(output)
 
 	script:
 		output="mutations.tsv"
@@ -743,11 +714,11 @@ process DriverDiscovery {
 	label "core"
 
     input:
-        tuple val(cohort), path(combination), path(deconstruct_in), path(sig_likelihood), path(smregions), path(clustl_clusters), path(hotmaps_clusters), path(dndscv), val(cancer) from OUT_COMBINATION.join(VARIANTS_DECONSTRUCTSIGS2).join(OUT_DECONSTRUCTSIGS_SIGLIKELIHOOD).join(OUT_SMREGIONS2).join(OUT_ONCODRIVECLUSTL_CLUSTERS).join(OUT_HOTMAPS_CLUSTERS).join(OUT_DNDSCV2).join(CANCERS3)
-	path referenceFiles from REFERENCE_FILES
+        tuple val(cohort), path(combination), path(deconstruct_in), path(sig_likelihood), path(smregions), path(clustl_clusters), path(hotmaps_clusters), path(dndscv), val(cancer)
+	path referenceFiles
     output:
-		path(output_drivers) into DRIVERS
-		path(output_vet) into VET
+		path(output_drivers), emit: drivers
+		path(output_vet), emit: vet
 
 	script:
 		output_drivers = "${cohort}.drivers.tsv"
@@ -773,15 +744,15 @@ process DriverSummary {
 	label "core"
 
     input:
-        path (input) from DRIVERS.collect()
-        path (input_vet) from VET.collect()
-        path (mutations) from MUTATIONS_SUMMARY
-        path (cohortsSummary) from COHORT_SUMMARY
-	path referenceFiles from REFERENCE_FILES
+        path (input)
+        path (input_vet)
+        path (mutations)
+        path (cohortsSummary)
+	path referenceFiles
     output:
-		path("drivers.tsv") into DRIVERS_SUMMARY
-		path("unique_drivers.tsv") into UNIQUE_DRIVERS
-		path("unfiltered_drivers.tsv") into UNFILTER_DRIVERS
+		path("drivers.tsv"), emit: drivers
+		path("unique_drivers.tsv"), emit: unique
+		path("unfiltered_drivers.tsv"), emit: unfiltered
 
 	script:
 		"""
@@ -799,10 +770,10 @@ process ParseProfile {
 	label "core"
 
     input:
-        tuple val(cohort), path(signature) from SIGNATURES5
+        tuple val(cohort), path(signature)
 
     output:
-		tuple val(cohort), path("*.mutrate.json") into OUT_MUTRATE
+		tuple val(cohort), path("*.mutrate.json")
 
 	script:
 		"""
@@ -818,38 +789,156 @@ process DriverSaturation {
 	label "core"
 
     input:
-        path (drivers) from DRIVERS_SUMMARY
-	path referenceFiles from REFERENCE_FILES
+        path (drivers)
+	path referenceFiles
     output:
-		path("*.vep.gz") into DRIVERS_SATURATION
+		path("*.vep.gz")
 
 	script:
 		"""
 
 		drivers-saturation --drivers ${drivers}
-		
+
 		"""
 }
 
-FILT_MNVS_INPUTS = PARSED_VEP7.map { it -> it[1] }
 process FilterMNVS {
 	tag "MNVs filter"
 	publishDir "${STEPS_FOLDER}/boostDM", mode: "copy"
 	label "core"
 
 	input:
-		path(input) from FILT_MNVS_INPUTS.collect()
+		path(input)
 
 	output:
-		path("mnvs.tsv.gz") into MNVS_FILTER
-	
+		path("mnvs.tsv.gz")
+
 	script:
 		"""
-		
+
 		parse-mnvs ${input}
 
 		"""
 }
 
 
+workflow {
 
+	// ---- input channels ----
+	input_ch = Channel.fromPath(params.input.tokenize())
+	annotations_ch = Channel.value(params.annotations)
+
+	// ---- reference datasets (value channel so it is reused by every cohort) ----
+	DownloadDatasets()
+	ref = DownloadDatasets.out.first()
+
+	// ---- parse input into per-cohort files ----
+	ParseInput(input_ch, annotations_ch)
+	cohorts = ParseInput.out
+		.flatten()
+		.map { it -> [it.baseName.split('\\.')[0], it] }
+
+	// ---- per-cohort metadata ----
+	LoadCancer(cohorts)
+	LoadPlatform(cohorts)
+	LoadGenome(cohorts)
+	cancers   = LoadCancer.out
+	platforms = LoadPlatform.out
+	genomes   = LoadGenome.out
+
+	// ---- variant processing / filtering ----
+	ProcessVariants(cohorts.join(platforms).join(genomes), ref)
+	variants = ProcessVariants.out.variants
+
+	// ---- mutational profile / signatures ----
+	FormatSignature(variants, ref)
+	ComputeProfile(FormatSignature.out.join(platforms), ref)
+	signatures = ComputeProfile.out
+
+	// ---- OncodriveFML ----
+	FormatFML(variants, ref)
+	OncodriveFML(FormatFML.out.join(signatures), ref)
+
+	// ---- OncodriveCLUSTL ----
+	FormatCLUSTL(variants, ref)
+	OncodriveCLUSTL(FormatCLUSTL.out.join(signatures).join(cancers), ref)
+
+	// ---- dNdScv ----
+	FormatDNDSCV(variants, ref)
+	dNdScv(FormatDNDSCV.out, ref)
+
+	// ---- VEP annotation ----
+	FormatVEP(variants, ref)
+	VEP(FormatVEP.out, ref)
+	ProcessVEPoutput(VEP.out)
+	parsed_vep = ProcessVEPoutput.out.parsed
+
+	// ---- SMRegions ----
+	FilterNonSynonymous(parsed_vep)
+	FormatSMRegions(FilterNonSynonymous.out, ref)
+	SMRegions(FormatSMRegions.out.join(signatures), ref)
+
+	// ---- CBaSE ----
+	FormatCBaSE(parsed_vep, ref)
+	CBaSE(FormatCBaSE.out, ref)
+
+	// ---- MutPanning ----
+	FormatMutPanning(parsed_vep, ref)
+	MutPanning(FormatMutPanning.out, ref)
+
+	// ---- HotMAPS ----
+	FormatHotMAPS(parsed_vep, ref)
+	HotMAPS(FormatHotMAPS.out.join(signatures), ref)
+
+	// ---- combination of the 7 methods ----
+	Combination(
+		OncodriveFML.out
+			.join(OncodriveCLUSTL.out.elements)
+			.join(dNdScv.out.dndscv)
+			.join(SMRegions.out)
+			.join(CBaSE.out)
+			.join(MutPanning.out)
+			.join(HotMAPS.out.hotmaps),
+		ref
+	)
+
+	// ---- deconstructSigs ----
+	FormatdeconstructSigs(parsed_vep, ref)
+	deconstructSigs(FormatdeconstructSigs.out, ref)
+
+	// ---- cohort / mutation summaries ----
+	CohortCounts(cohorts.join(cancers).join(platforms))
+	cohort_counts_list = CohortCounts.out.map { it -> it[1] }
+	CohortSummary(cohort_counts_list.collect(), ref)
+
+	mutations_inputs = parsed_vep.map { it -> it[1] }
+	MutationsSummary(mutations_inputs.collect())
+
+	// ---- driver discovery ----
+	DriverDiscovery(
+		Combination.out
+			.join(FormatdeconstructSigs.out)
+			.join(deconstructSigs.out.likelihood)
+			.join(SMRegions.out)
+			.join(OncodriveCLUSTL.out.clusters)
+			.join(HotMAPS.out.clusters)
+			.join(dNdScv.out.dndscv)
+			.join(cancers),
+		ref
+	)
+
+	DriverSummary(
+		DriverDiscovery.out.drivers.collect(),
+		DriverDiscovery.out.vet.collect(),
+		MutationsSummary.out,
+		CohortSummary.out,
+		ref
+	)
+
+	// ---- boostDM inputs ----
+	ParseProfile(signatures)
+	DriverSaturation(DriverSummary.out.drivers, ref)
+
+	filt_mnvs_inputs = parsed_vep.map { it -> it[1] }
+	FilterMNVS(filt_mnvs_inputs.collect())
+}
