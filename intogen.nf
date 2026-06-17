@@ -825,12 +825,15 @@ process FilterMNVS {
 workflow {
 
 	// ---- input channels ----
-	input_ch = Channel.fromPath(params.input.tokenize())
+	// each cohort is a directory (metadata.yaml + mutations.maf), so match
+	// directories (not files); fail loudly if the glob matches nothing
+	input_ch = Channel.fromPath(params.input.tokenize(), type: 'dir', checkIfExists: true)
 	annotations_ch = Channel.value(params.annotations)
 
-	// ---- reference datasets (value channel so it is reused by every cohort) ----
+	// ---- reference datasets (value channel: a no-input process emits a value
+	// channel, so it is reused by every per-cohort task) ----
 	DownloadDatasets()
-	ref = DownloadDatasets.out.first()
+	ref = DownloadDatasets.out
 
 	// ---- parse input into per-cohort files ----
 	ParseInput(input_ch, annotations_ch)
