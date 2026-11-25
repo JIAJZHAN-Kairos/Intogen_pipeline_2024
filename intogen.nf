@@ -330,7 +330,7 @@ process dNdScv {
 
 	script:
 		"""
-		Rscript /dndscv/dndscv.R \
+		intogen_dndscv.R \
 			${input} ${cohort}.dndscv.tsv.gz \
 			${cohort}.dndscv_annotmuts.tsv.gz \
 			${cohort}.dndscv_genemuts.tsv.gz
@@ -576,7 +576,7 @@ process HotMAPS {
 
 	script:
 		"""
-		/bin/sh /hotmaps/hotmaps.sh ${input} . ${signatures} \
+		bash /hotmaps/hotmaps.sh ${input} . ${signatures} \
 			${params.datasets}/hotmaps ${task.cpus}
 		"""
 }
